@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>minimal-inet-project</name>
+	<name>smile-examples</name>
 	<comment></comment>
 	<projects>
 		<project>inet</project>
