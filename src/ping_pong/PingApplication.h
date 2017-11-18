@@ -18,6 +18,7 @@
 #include <IdealApplication.h>
 
 namespace smile_examples {
+namespace ping_pong {
 
 class PingApplication : public smile::IdealApplication
 {
@@ -45,4 +46,5 @@ class PingApplication : public smile::IdealApplication
   unsigned int frameSequenceNumber{0};
 };
 
+}  // namespace ping_pong
 }  // namespace smile_examples

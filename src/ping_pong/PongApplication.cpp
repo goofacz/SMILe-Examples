@@ -16,6 +16,7 @@
 #include "PongApplication.h"
 
 namespace smile_examples {
+namespace ping_pong {
 
 Define_Module(PongApplication);
 
@@ -53,4 +54,5 @@ void PongApplication::handleRxCompletionSignal(const smile::IdealRxCompletion& c
           << endl;
 }
 
+}  // namespace ping_pong
 }  // namespace smile_examples

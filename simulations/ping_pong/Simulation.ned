@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package smile_examples.simulations.PingPong;
+package smile_examples.simulations.ping_pong;
 
 import smile.RadioNode;
 import smile.MeasurementsLogger;
@@ -23,7 +23,7 @@ import inet.mobility.single.LinearMobility;
 import inet.physicallayer.idealradio.IdealRadioMedium;
 import inet.visualizer.integrated.IntegratedCanvasVisualizer;
 
-network PingPong
+network Simulation
 {
     submodules:
         radioMedium: IdealRadioMedium {

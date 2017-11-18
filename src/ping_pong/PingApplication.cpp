@@ -13,11 +13,12 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include <cassert>
-
 #include "PingApplication.h"
 
+#include <cassert>
+
 namespace smile_examples {
+namespace ping_pong {
 
 Define_Module(PingApplication);
 
@@ -77,4 +78,5 @@ void PingApplication::handleRxCompletionSignal(const smile::IdealRxCompletion& c
           << endl;
 }
 
+}  // namespace ping_pong
 }  // namespace smile_examples

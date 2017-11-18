@@ -12,14 +12,13 @@
 //   along with this program; if not, write to the Free Software Foundation,
 //   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
-package smile_examples;
+package smile_examples.ping_pong;
 
 import smile.IdealApplication;
 
-simple PingApplication extends IdealApplication
+simple PongApplication extends IdealApplication
 {
     parameters:
-        @class(smile_examples::PingApplication);
+        @class(smile_examples::ping_pong::PongApplication);
         string remoteMacAddress = default("");
-        int delay = default(5ms) @unit(ms);
 }

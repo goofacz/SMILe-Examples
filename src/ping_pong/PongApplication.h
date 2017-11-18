@@ -18,6 +18,7 @@
 #include <IdealApplication.h>
 
 namespace smile_examples {
+namespace ping_pong {
 
 class PongApplication : public smile::IdealApplication
 {
@@ -38,4 +39,5 @@ class PongApplication : public smile::IdealApplication
   void handleRxCompletionSignal(const smile::IdealRxCompletion& completion) override;
 };
 
+}  // namespace ping_pong
 }  // namespace smile_examples
