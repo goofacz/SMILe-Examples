@@ -41,6 +41,11 @@ class MobileApplication : public smile::IdealApplication
   void handleTxCompletionSignal(const smile::IdealTxCompletion& completion) override;
 
   void handleRxCompletionSignal(const smile::IdealRxCompletion& completion) override;
+
+  void startRanging();
+
+  std::unique_ptr<cMessage> rxTimeoutTimerMessage;
+  std::list<inet::MACAddress> anchorAddresses;
 };
 
 }  // namespace ds_twr

@@ -13,9 +13,10 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "MobileApplication.h"
+#include <algorithm>
 
-#include <cassert>
+#include "MobileApplication.h"
+#include "PollFrame_m.h"
 
 namespace smile_examples {
 namespace ds_twr {
@@ -24,20 +25,32 @@ Define_Module(MobileApplication);
 
 MobileApplication::~MobileApplication()
 {
-  // TODO
+  if (rxTimeoutTimerMessage) {
+    cancelEvent(rxTimeoutTimerMessage.get());
+  }
 }
 
 void MobileApplication::initialize(int stage)
 {
   IdealApplication::initialize(stage);
   if (stage == inet::INITSTAGE_APPLICATION_LAYER) {
-    // TODO
+    rxTimeoutTimerMessage = std::make_unique<cMessage>("Ranging RX timeout");
+    anchorAddresses.emplace_back("DE-AD-BE-EF-10-01");
+    anchorAddresses.emplace_back("DE-AD-BE-EF-10-02");
+    anchorAddresses.emplace_back("DE-AD-BE-EF-10-03");
+
+    startRanging();
   }
 }
 
 void MobileApplication::handleSelfMessage(cMessage* message)
 {
-  // TODO
+  if (message == rxTimeoutTimerMessage.get()) {
+
+      // Start ranging with next anchor
+      std::rotate(anchorAddresses.begin(), std::next(anchorAddresses.begin()), anchorAddresses.end());
+      startRanging();
+  }
 }
 
 void MobileApplication::handleIncommingMessage(cMessage* newMessage)
@@ -54,6 +67,18 @@ void MobileApplication::handleTxCompletionSignal(const smile::IdealTxCompletion&
 void MobileApplication::handleRxCompletionSignal(const smile::IdealRxCompletion& completion)
 {
   // TODO
+}
+
+void MobileApplication::startRanging()
+{
+  const auto& anchorAddress = anchorAddresses.front();
+  auto frame = createFrame<PollFrame>(anchorAddress, "POLL");
+  frame->setBitLength(10);
+
+  sendDelayed(frame.release(), 0, "out");
+
+  const auto rxTimeout = clockTime() + SimTime{par("rangingRxTimeout").longValue(), SIMTIME_MS};
+  scheduleAt(rxTimeout, rxTimeoutTimerMessage.get());
 }
 
 }  // namespace ds_twr

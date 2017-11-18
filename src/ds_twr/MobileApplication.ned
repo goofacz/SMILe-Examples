@@ -20,6 +20,6 @@ simple MobileApplication extends IdealApplication
 {
     parameters:
         @class(smile_examples::ds_twr::MobileApplication);
-        string remoteMacAddress = default("");
-        int delay = default(5ms) @unit(ms);
+        int messageProcessingTime = default(4ms) @unit(ms);
+        int rangingRxTimeout = default(5ms) @unit(ms);
 }
