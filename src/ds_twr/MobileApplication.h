@@ -44,8 +44,12 @@ class MobileApplication : public smile::IdealApplication
 
   void startRanging();
 
+  static const std::string pollFrameName;
+
   std::unique_ptr<cMessage> rxTimeoutTimerMessage;
   std::list<inet::MACAddress> anchorAddresses;
+
+  SimTime pollTxBeginTimestamp{0};
 };
 
 }  // namespace ds_twr

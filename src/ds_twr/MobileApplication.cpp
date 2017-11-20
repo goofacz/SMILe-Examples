@@ -23,6 +23,8 @@ namespace ds_twr {
 
 Define_Module(MobileApplication);
 
+const std::string MobileApplication::pollFrameName{"POLL"};
+
 MobileApplication::~MobileApplication()
 {
   if (rxTimeoutTimerMessage) {
@@ -46,10 +48,9 @@ void MobileApplication::initialize(int stage)
 void MobileApplication::handleSelfMessage(cMessage* message)
 {
   if (message == rxTimeoutTimerMessage.get()) {
-
-      // Start ranging with next anchor
-      std::rotate(anchorAddresses.begin(), std::next(anchorAddresses.begin()), anchorAddresses.end());
-      startRanging();
+    // Start ranging with next anchor
+    std::rotate(anchorAddresses.begin(), std::next(anchorAddresses.begin()), anchorAddresses.end());
+    startRanging();
   }
 }
 
@@ -61,7 +62,18 @@ void MobileApplication::handleIncommingMessage(cMessage* newMessage)
 
 void MobileApplication::handleTxCompletionSignal(const smile::IdealTxCompletion& completion)
 {
-  // TODO
+  auto formatTimestamp = [](const auto& timestamp) { return timestamp.format(SIMTIME_FS, ".", "", true); };
+
+  const auto& frame = completion.getFrame();
+  if (pollFrameName == frame->getName()) {
+    pollTxBeginTimestamp = completion.getOperationBeginClockTimestamp();
+    EV_INFO << "POLL transmission started at " << formatTimestamp(pollTxBeginTimestamp) << " and finished at "
+            << formatTimestamp(clockTime()) << endl;
+  }
+  else {
+    throw cRuntimeError{"Received TX completion signal for unexpected packet of type %s and name \"%s\"",
+                        frame->getClassName(), frame->getName()};
+  }
 }
 
 void MobileApplication::handleRxCompletionSignal(const smile::IdealRxCompletion& completion)
@@ -72,7 +84,7 @@ void MobileApplication::handleRxCompletionSignal(const smile::IdealRxCompletion&
 void MobileApplication::startRanging()
 {
   const auto& anchorAddress = anchorAddresses.front();
-  auto frame = createFrame<PollFrame>(anchorAddress, "POLL");
+  auto frame = createFrame<PollFrame>(anchorAddress, pollFrameName.c_str());
   frame->setBitLength(10);
 
   sendDelayed(frame.release(), 0, "out");
