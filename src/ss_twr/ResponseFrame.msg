@@ -17,9 +17,9 @@ cplusplus{{
 #include <inet/linklayer/ideal/IdealMacFrame_m.h>  
 }}
 
-namespace smile_examples;
+namespace smile_examples::ss_twr;
 
 packet inet::IdealMacFrame;
 
-packet PollFrame extends inet::IdealMacFrame
+packet ResponseFrame extends inet::IdealMacFrame
 {}

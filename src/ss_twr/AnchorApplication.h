@@ -16,9 +16,10 @@
 #pragma once
 
 #include <IdealApplication.h>
+#include "PollFrame_m.h"
 
 namespace smile_examples {
-namespace ds_twr {
+namespace ss_twr {
 
 class AnchorApplication : public smile::IdealApplication
 {
@@ -26,22 +27,23 @@ class AnchorApplication : public smile::IdealApplication
   AnchorApplication() = default;
   AnchorApplication(const AnchorApplication& source) = delete;
   AnchorApplication(AnchorApplication&& source) = delete;
-  ~AnchorApplication();
+  ~AnchorApplication() = default;
 
   AnchorApplication& operator=(const AnchorApplication& source) = delete;
   AnchorApplication& operator=(AnchorApplication&& source) = delete;
 
  private:
-  void initialize(int stage) override;
-
-  void handleSelfMessage(cMessage* message) override;
-
   void handleIncommingMessage(cMessage* newMessage) override;
 
-  void handleTxCompletionSignal(const smile::IdealTxCompletion& completion) override;
-
   void handleRxCompletionSignal(const smile::IdealRxCompletion& completion) override;
+
+  void handlePollFrame(std::unique_ptr<PollFrame> pollFrame);
+
+  static const std::string pollFrameName;
+  static const std::string responseFrameName;
+
+  SimTime pollRxBeginTimestamp{0};
 };
 
-}  // namespace ds_twr
+}  // namespace ss_twr
 }  // namespace smile_examples

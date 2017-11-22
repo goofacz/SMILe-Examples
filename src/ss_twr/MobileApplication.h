@@ -17,8 +17,10 @@
 
 #include <IdealApplication.h>
 
+#include "ResponseFrame_m.h"
+
 namespace smile_examples {
-namespace ds_twr {
+namespace ss_twr {
 
 class MobileApplication : public smile::IdealApplication
 {
@@ -44,13 +46,17 @@ class MobileApplication : public smile::IdealApplication
 
   void startRanging();
 
+  void handleResponseFrame(std::unique_ptr<ResponseFrame> frame);
+
   static const std::string pollFrameName;
+  static const std::string responseFrameName;
 
   std::unique_ptr<cMessage> rxTimeoutTimerMessage;
-  std::list<inet::MACAddress> anchorAddresses;
+  std::vector<inet::MACAddress> anchorAddresses;
 
   SimTime pollTxBeginTimestamp{0};
+  SimTime responseRxBeginTimestamp{0};
 };
 
-}  // namespace ds_twr
+}  // namespace ss_twr
 }  // namespace smile_examples

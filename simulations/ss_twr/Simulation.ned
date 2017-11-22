@@ -13,14 +13,14 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package smile_examples.simulations.ds_twr;
+package smile_examples.simulations.ss_twr;
 
 import smile.RadioNode;
 import smile.MeasurementsLogger;
 import smile.IdealClock;
 import smile.IdealRangingNicDriver;
-import smile_examples.ds_twr.MobileApplication;
-import smile_examples.ds_twr.AnchorApplication;
+import smile_examples.ss_twr.MobileApplication;
+import smile_examples.ss_twr.AnchorApplication;
 import inet.mobility.single.LinearMobility;
 import inet.physicallayer.idealradio.IdealRadioMedium;
 import inet.visualizer.integrated.IntegratedCanvasVisualizer;

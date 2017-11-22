@@ -12,14 +12,14 @@
 //   along with this program; if not, write to the Free Software Foundation,
 //   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
-package smile_examples.ds_twr;
+package smile_examples.ss_twr;
 
 import smile.IdealApplication;
 
 simple MobileApplication extends IdealApplication
 {
     parameters:
-        @class(smile_examples::ds_twr::MobileApplication);
+        @class(smile_examples::ss_twr::MobileApplication);
         int messageProcessingTime = default(4ms) @unit(ms);
         int rangingRxTimeout = default(5ms) @unit(ms);
 }

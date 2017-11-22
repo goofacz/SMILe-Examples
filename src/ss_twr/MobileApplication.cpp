@@ -13,17 +13,21 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
+#include <utilities.h>
 #include <algorithm>
 
 #include "MobileApplication.h"
 #include "PollFrame_m.h"
 
 namespace smile_examples {
-namespace ds_twr {
+namespace ss_twr {
 
 Define_Module(MobileApplication);
 
 const std::string MobileApplication::pollFrameName{"POLL"};
+const std::string MobileApplication::responseFrameName{"RESPONSE"};
+
+static auto formatTimestamp = [](const auto& timestamp) { return timestamp.format(SIMTIME_FS, ".", "", true); };
 
 MobileApplication::~MobileApplication()
 {
@@ -57,13 +61,11 @@ void MobileApplication::handleSelfMessage(cMessage* message)
 void MobileApplication::handleIncommingMessage(cMessage* newMessage)
 {
   std::unique_ptr<cMessage> message{newMessage};
-  // TODO
+  handleResponseFrame(smile::dynamic_unique_ptr_cast<ResponseFrame>(std::move(message)));
 }
 
 void MobileApplication::handleTxCompletionSignal(const smile::IdealTxCompletion& completion)
 {
-  auto formatTimestamp = [](const auto& timestamp) { return timestamp.format(SIMTIME_FS, ".", "", true); };
-
   const auto& frame = completion.getFrame();
   if (pollFrameName == frame->getName()) {
     pollTxBeginTimestamp = completion.getOperationBeginClockTimestamp();
@@ -78,7 +80,16 @@ void MobileApplication::handleTxCompletionSignal(const smile::IdealTxCompletion&
 
 void MobileApplication::handleRxCompletionSignal(const smile::IdealRxCompletion& completion)
 {
-  // TODO
+  const auto& frame = completion.getFrame();
+  if (responseFrameName == frame->getName()) {
+    responseRxBeginTimestamp = completion.getOperationBeginClockTimestamp();
+    EV_INFO << "RESPONSE reception started at " << formatTimestamp(pollTxBeginTimestamp) << " and finished at "
+            << formatTimestamp(clockTime()) << endl;
+  }
+  else {
+    throw cRuntimeError{"Received RX completion signal for unexpected packet of type %s and name \"%s\"",
+                        frame->getClassName(), frame->getName()};
+  }
 }
 
 void MobileApplication::startRanging()
@@ -91,7 +102,17 @@ void MobileApplication::startRanging()
 
   const auto rxTimeout = clockTime() + SimTime{par("rangingRxTimeout").longValue(), SIMTIME_MS};
   scheduleAt(rxTimeout, rxTimeoutTimerMessage.get());
+
+  pollTxBeginTimestamp = SimTime::ZERO;
+  responseRxBeginTimestamp = SimTime::ZERO;
 }
 
-}  // namespace ds_twr
+void MobileApplication::handleResponseFrame(std::unique_ptr<ResponseFrame> frame)
+{
+  const auto processingTime = SimTime{par("messageProcessingTime").longValue(), SIMTIME_MS};
+  const auto tof = ((responseRxBeginTimestamp - pollTxBeginTimestamp) - processingTime)/2;
+  EV_INFO << "ToF " << formatTimestamp(tof) << endl;
+}
+
+}  // namespace ss_twr
 }  // namespace smile_examples
