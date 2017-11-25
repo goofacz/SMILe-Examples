@@ -16,7 +16,7 @@
 package smile_examples.simulations.ss_twr;
 
 import smile.RadioNode;
-import smile.MeasurementsLogger;
+import smile.Logger;
 import smile.IdealClock;
 import smile.IdealRangingNicDriver;
 import smile_examples.ss_twr.MobileApplication;
@@ -36,9 +36,8 @@ network Simulation
             @display("p=287,30");
         }
         
-        measurementsLogger: MeasurementsLogger {
-            directoryPath = ".";
-            fileName = "tmp";
+        logger: Logger {
+            fileNamePrefix = "ss_twr";
             @display("p=69,30");
         }
 

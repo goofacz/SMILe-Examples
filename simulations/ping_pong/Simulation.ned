@@ -16,7 +16,7 @@
 package smile_examples.simulations.ping_pong;
 
 import smile.RadioNode;
-import smile.MeasurementsLogger;
+import smile.Logger;
 import smile.IdealClock;
 import smile.IdealRangingNicDriver;
 import inet.mobility.single.LinearMobility;
@@ -34,9 +34,8 @@ network Simulation
             @display("p=287,30");
         }
         
-        measurementsLogger: MeasurementsLogger {
-            directoryPath = ".";
-            fileName = "tmp";
+        Logger: Logger {
+            fileNamePrefix = "ping_pong";
             @display("p=69,30");
         }
 
