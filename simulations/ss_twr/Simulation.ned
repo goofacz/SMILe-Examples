@@ -38,6 +38,7 @@ network Simulation
         
         logger: Logger {
             fileNamePrefix = "ss_twr";
+            overwrite = true;
             @display("p=69,30");
         }
 

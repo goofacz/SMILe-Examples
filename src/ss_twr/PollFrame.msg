@@ -22,4 +22,6 @@ namespace smile_examples::ss_twr;
 packet inet::IdealMacFrame;
 
 packet PollFrame extends inet::IdealMacFrame
-{}
+{
+	unsigned long sequenceNumber = 0;
+}

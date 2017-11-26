@@ -16,7 +16,7 @@
 #pragma once
 
 #include <IdealApplication.h>
-
+#include <Logger.h>
 #include "ResponseFrame_m.h"
 
 namespace smile_examples {
@@ -56,6 +56,8 @@ class MobileApplication : public smile::IdealApplication
 
   SimTime pollTxBeginTimestamp{0};
   SimTime responseRxBeginTimestamp{0};
+  smile::Logger::Handle framesLog;
+  unsigned long sequenceNumber{0};
 };
 
 }  // namespace ss_twr

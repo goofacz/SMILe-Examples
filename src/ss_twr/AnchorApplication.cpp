@@ -16,6 +16,7 @@
 #include "AnchorApplication.h"
 #include "ResponseFrame_m.h"
 
+#include <CsvLogger.h>
 #include <utilities.h>
 
 namespace smile_examples {
@@ -28,10 +29,47 @@ const std::string AnchorApplication::responseFrameName{"RESPONSE"};
 
 static auto formatTimestamp = [](const auto& timestamp) { return timestamp.format(SIMTIME_FS, ".", "", true); };
 
+void AnchorApplication::initialize(int stage)
+{
+  IdealApplication::initialize(stage);
+  if (stage == inet::INITSTAGE_PHYSICAL_ENVIRONMENT_2) {
+    auto& logger = getLogger();
+    framesLog = logger.obtainHandle("frames");
+
+    const auto& nicDriver = getNicDriver();
+    auto anchorsLog = logger.obtainHandle("anchor_nodes");
+    const auto entry = smile::csv_logger::compose(nicDriver.getMacAddress(), getCurrentTruePosition());
+    logger.append(anchorsLog, entry);
+  }
+}
+
 void AnchorApplication::handleIncommingMessage(cMessage* newMessage)
 {
   std::unique_ptr<cMessage> message{newMessage};
   handlePollFrame(smile::dynamic_unique_ptr_cast<PollFrame>(std::move(message)));
+}
+
+void AnchorApplication::handleTxCompletionSignal(const smile::IdealTxCompletion& completion)
+{
+  const auto& frame = completion.getFrame();
+  if (responseFrameName == frame->getName()) {
+    EV_INFO << "RESPONSE transmission started at " << formatTimestamp(completion.getOperationBeginClockTimestamp())
+            << " and finished at " << formatTimestamp(clockTime()) << endl;
+
+    const auto frame = dynamic_cast<const ResponseFrame*>(completion.getFrame());
+    if (!frame) {
+      throw cRuntimeError{"Received signal for %s message, expected ResponseFrame", frame->getClassName()};
+    }
+
+    auto& logger = getLogger();
+    const auto entry =
+        smile::csv_logger::compose(completion, frame->getSrc(), frame->getDest(), frame->getSequenceNumber());
+    logger.append(framesLog, entry);
+  }
+  else {
+    throw cRuntimeError{"Received TX completion signal for unexpected packet of type %s and name \"%s\"",
+                        frame->getClassName(), frame->getName()};
+  }
 }
 
 void AnchorApplication::handleRxCompletionSignal(const smile::IdealRxCompletion& completion)
@@ -41,6 +79,16 @@ void AnchorApplication::handleRxCompletionSignal(const smile::IdealRxCompletion&
     pollRxBeginTimestamp = completion.getOperationBeginClockTimestamp();
     EV_INFO << "POLL reception started at " << formatTimestamp(pollRxBeginTimestamp) << " and finished at "
             << formatTimestamp(clockTime()) << endl;
+
+    const auto frame = dynamic_cast<const PollFrame*>(completion.getFrame());
+    if (!frame) {
+      throw cRuntimeError{"Received signal for %s message, expected PollFrame", frame->getClassName()};
+    }
+
+    auto& logger = getLogger();
+    const auto entry =
+        smile::csv_logger::compose(completion, frame->getSrc(), frame->getDest(), frame->getSequenceNumber());
+    logger.append(framesLog, entry);
   }
   else {
     throw cRuntimeError{"Received RX completion signal for unexpected packet of type %s and name \"%s\"",
@@ -53,6 +101,7 @@ void AnchorApplication::handlePollFrame(std::unique_ptr<PollFrame> pollFrame)
   const auto& mobileAddress = pollFrame->getSrc();
   auto responseFrame = createFrame<ResponseFrame>(mobileAddress, responseFrameName.c_str());
   responseFrame->setBitLength(10);
+  responseFrame->setSequenceNumber(pollFrame->getSequenceNumber());
 
   const auto processingTime = SimTime{par("messageProcessingTime").longValue(), SIMTIME_MS};
   sendDelayed(responseFrame.release(), processingTime, "out");

@@ -16,6 +16,7 @@
 #pragma once
 
 #include <IdealApplication.h>
+#include <Logger.h>
 #include "PollFrame_m.h"
 
 namespace smile_examples {
@@ -33,7 +34,11 @@ class AnchorApplication : public smile::IdealApplication
   AnchorApplication& operator=(AnchorApplication&& source) = delete;
 
  private:
+  void initialize(int stage) override;
+
   void handleIncommingMessage(cMessage* newMessage) override;
+
+  void handleTxCompletionSignal(const smile::IdealTxCompletion& completion) override;
 
   void handleRxCompletionSignal(const smile::IdealRxCompletion& completion) override;
 
@@ -43,6 +48,7 @@ class AnchorApplication : public smile::IdealApplication
   static const std::string responseFrameName;
 
   SimTime pollRxBeginTimestamp{0};
+  smile::Logger::Handle framesLog;
 };
 
 }  // namespace ss_twr
