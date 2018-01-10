@@ -41,8 +41,8 @@ if __name__ == '__main__':
         pyplot.plot(timestamps['simulation_timestamp'], timestamps['clock_timestamp'], label=elements[1])
 
     pyplot.title('Clock models evaluation')
-    pyplot.xlabel('Simulation timestamps [ns]')
-    pyplot.ylabel('Clock timestamps [ns]')
+    pyplot.xlabel('Simulation timestamps [ps]')
+    pyplot.ylabel('Clock timestamps [ps]')
     pyplot.legend()
     pyplot.grid(True)
     pyplot.show()

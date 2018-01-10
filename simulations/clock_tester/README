@@ -1,7 +1,7 @@
 *** OVERVIEW ***
 
-This simulation evaluates clock models. It schedules self message every 
-picosecond and logs timestamps. Each clock model' logs are be stored in
+This simulation evaluates clock models. It schedules periodically self message 
+and logs timestamps. Each clock model' logs are be stored in
 separate CSV file (distinguished by name suffix).
 
 *** Logs files format ***

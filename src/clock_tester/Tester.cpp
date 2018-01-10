@@ -13,9 +13,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include <inet/common/ModuleAccess.h>
-#include <CsvLogger.h>
 #include "Tester.h"
+#include <CsvLogger.h>
+#include <inet/common/ModuleAccess.h>
 
 namespace smile_examples {
 namespace clock_tester {
@@ -30,7 +30,7 @@ void Tester::initialize(int stage)
     logHandle = logger->obtainHandle(par("logPrefix").stdstringValue());
 
     auto message = std::make_unique<cMessage>("timer");
-    const auto timestamp = clockTime() + SimTime(1, omnetpp::SIMTIME_NS);
+    const auto timestamp = clockTime() + SimTime(selfMessagePeriod, selfMessagePeriodUnit);
     scheduleAt(timestamp, message.release());
   }
 }
@@ -38,11 +38,11 @@ void Tester::initialize(int stage)
 void Tester::handleSelfMessage(cMessage* newMessage)
 {
   std::unique_ptr<cMessage> message{newMessage};
-  const auto timestamp = clockTime() + SimTime(1, omnetpp::SIMTIME_NS);
+  const auto timestamp = clockTime() + SimTime(selfMessagePeriod, selfMessagePeriodUnit);
   scheduleAt(timestamp, message.release());
 
   const auto entry = smile::csv_logger::compose(simTime(), clockTime());
-  logger->append(logHandle,  entry);
+  logger->append(logHandle, entry);
 }
 
 }  // namespace clock_tester

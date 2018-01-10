@@ -36,6 +36,9 @@ class Tester : public smile::ClockDecorator<omnetpp::cSimpleModule>
   void initialize(int stage) override;
   void handleSelfMessage(cMessage* newMessage) override;
 
+  const unsigned int selfMessagePeriod{10};
+  const SimTimeUnit selfMessagePeriodUnit{omnetpp::SIMTIME_MS};
+
   smile::Logger* logger{nullptr};
   smile::Logger::Handle logHandle;
 };
