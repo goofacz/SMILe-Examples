@@ -20,6 +20,7 @@ module Tester
 {
     parameters:
         @class(smile_examples::clock_tester::Tester);
+        string loggerModule = default("^.logger");
         string clockModule = default(".clock"); 
         string clockType = default("");
         string logPrefix = default("");

@@ -21,7 +21,7 @@ import smile_examples.clock_tester.Tester;
 network Simulation
 {
     submodules:
-        Logger: Logger {
+        logger: Logger {
             fileNamePrefix = "clock_tester";
             @display("p=69,30");
         }

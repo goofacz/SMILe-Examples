@@ -16,6 +16,7 @@
 #pragma once
 
 #include <ClockDecorator.h>
+#include <Logger.h>
 
 namespace smile_examples {
 namespace clock_tester {
@@ -33,8 +34,10 @@ class Tester : public smile::ClockDecorator<omnetpp::cSimpleModule>
 
  private:
   void initialize(int stage) override;
-
   void handleSelfMessage(cMessage* newMessage) override;
+
+  smile::Logger* logger{nullptr};
+  smile::Logger::Handle logHandle;
 };
 
 }  // namespace clock_tester
