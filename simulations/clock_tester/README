@@ -1,0 +1,11 @@
+*** OVERVIEW ***
+
+This simulation evaluates clock models. It schedules self message every 
+picosecond and logs timestamps. Each clock model' logs are be stored in
+separate CSV file (distinguished by name suffix).
+
+*** Logs files format ***
+
+File columns: 
+    1. Simulation timestamp [ps]
+    1. Local clock timestamp [ps]

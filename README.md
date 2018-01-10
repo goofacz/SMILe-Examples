@@ -13,3 +13,6 @@ Minimal simulation containing two radio nodes exchanging frame.
 **SS-TWR**
 
 This simulation implements Single-sided two Way ranging. It consists four nodes (three anchors and one mobile node). For more details please refer to simulation README file.
+
+**Clock tester**
+Simple tool evaluating clock models. Simulation simple schedules self messages every picosecond and logs pairs of simulation and local clock timestamps. For more details please refer to simulation README file.
