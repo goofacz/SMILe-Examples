@@ -35,11 +35,12 @@ if __name__ == '__main__':
     log_file_paths = glob.glob(logs_directory_path)
 
     for log_file_path in log_file_paths:
-        pattern = re.compile('(?:.*_)(\d+\w+)(?:.*)')
+        pattern = re.compile('(?:.*_)(\w+_[\d\w]+)(?:.*)')
         elements = pattern.match(log_file_path)
         timestamps = load_log_file(log_file_path)
         pyplot.plot(timestamps['simulation_timestamp'], timestamps['clock_timestamp'], label=elements[1])
 
+    pyplot.title('Clock models evaluation')
     pyplot.xlabel('Simulation timestamps [ns]')
     pyplot.ylabel('Clock timestamps [ns]')
     pyplot.legend()
