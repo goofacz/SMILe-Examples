@@ -13,36 +13,16 @@
 # along with this program.  If not, see http:#www.gnu.org/licenses/.
 #
 
-import os.path
-import numpy
 import argparse
 import glob
-import matplotlib.pyplot as pyplot
 import re
-
-
-def load_log_file(file_path):
-    columns = numpy.dtype({'names': ('simulation_timestamp', 'clock_timestamp'), 'formats': (int, int)})
-    return numpy.loadtxt(file_path, dtype=columns, delimiter=',', ndmin=1)
-
+import clock_tester.logger as logger
+import clock_tester.plot as plot
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process Clock Tester data..')
     parser.add_argument('logs_directory_path', type=str, nargs=1, help='Path to directory holding CSV logs')
     arguments = parser.parse_args()
 
-    logs_directory_path = os.path.join(*arguments.logs_directory_path, 'clock_tester_*csv')
-    log_file_paths = glob.glob(logs_directory_path)
-
-    for log_file_path in log_file_paths:
-        pattern = re.compile('(?:.*_)(\w+_[\d\w]+)(?:.*)')
-        elements = pattern.match(log_file_path)
-        timestamps = load_log_file(log_file_path)
-        pyplot.plot(timestamps['simulation_timestamp'], timestamps['clock_timestamp'], label=elements[1])
-
-    pyplot.title('Clock models evaluation')
-    pyplot.xlabel('Simulation timestamps [ps]')
-    pyplot.ylabel('Clock timestamps [ps]')
-    pyplot.legend()
-    pyplot.grid(True)
-    pyplot.show()
+    clock_model_logs = logger.load_directory(*arguments.logs_directory_path)
+    plot.display_multiple(clock_model_logs)
