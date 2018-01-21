@@ -76,7 +76,7 @@ void AnchorApplication::handleRxCompletionSignal(const smile::IdealRxCompletion&
 {
   const auto& frame = completion.getFrame();
   if (pollFrameName == frame->getName()) {
-    pollRxBeginTimestamp = completion.getOperationBeginClockTimestamp();
+    const auto& pollRxBeginTimestamp = completion.getOperationBeginClockTimestamp();
     EV_INFO << "POLL reception started at " << formatTimestamp(pollRxBeginTimestamp) << " and finished at "
             << formatTimestamp(clockTime()) << endl;
 
@@ -89,6 +89,8 @@ void AnchorApplication::handleRxCompletionSignal(const smile::IdealRxCompletion&
     const auto entry =
         smile::csv_logger::compose(completion, frame->getSrc(), frame->getDest(), frame->getSequenceNumber());
     logger.append(framesLog, entry);
+
+    responseTxClockTime = clockTime() + SimTime{par("messageProcessingTime").longValue(), SIMTIME_MS};
   }
   else {
     throw cRuntimeError{"Received RX completion signal for unexpected packet of type %s and name \"%s\"",
@@ -103,8 +105,8 @@ void AnchorApplication::handlePollFrame(std::unique_ptr<PollFrame> pollFrame)
   responseFrame->setBitLength(10);
   responseFrame->setSequenceNumber(pollFrame->getSequenceNumber());
 
-  const auto processingTime = SimTime{par("messageProcessingTime").longValue(), SIMTIME_MS};
-  sendDelayed(responseFrame.release(), processingTime, "out");
+  const auto delay = responseTxClockTime - clockTime();
+  sendDelayed(responseFrame.release(), delay, "out");
 }
 
 }  // namespace ss_twr

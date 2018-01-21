@@ -47,7 +47,7 @@ class AnchorApplication : public smile::IdealApplication
   static const std::string pollFrameName;
   static const std::string responseFrameName;
 
-  SimTime pollRxBeginTimestamp{0};
+  SimTime responseTxClockTime;
   smile::Logger::Handle framesLog;
 };
 
