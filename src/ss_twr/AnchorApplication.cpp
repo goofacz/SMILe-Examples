@@ -90,7 +90,7 @@ void AnchorApplication::handleRxCompletionSignal(const smile::IdealRxCompletion&
         smile::csv_logger::compose(completion, frame->getSrc(), frame->getDest(), frame->getSequenceNumber());
     logger.append(framesLog, entry);
 
-    responseTxClockTime = clockTime() + SimTime{par("messageProcessingTime").longValue(), SIMTIME_MS};
+    responseTxClockTime = pollRxBeginTimestamp + SimTime{par("messageProcessingTime").longValue(), SIMTIME_MS};
   }
   else {
     throw cRuntimeError{"Received RX completion signal for unexpected packet of type %s and name \"%s\"",

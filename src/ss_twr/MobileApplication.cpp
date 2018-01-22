@@ -103,7 +103,7 @@ void MobileApplication::handleRxCompletionSignal(const smile::IdealRxCompletion&
   const auto& frame = completion.getFrame();
   if (responseFrameName == frame->getName()) {
     responseRxBeginTimestamp = completion.getOperationBeginClockTimestamp();
-    EV_INFO << "RESPONSE reception started at " << formatTimestamp(pollTxBeginTimestamp) << " and finished at "
+    EV_INFO << "RESPONSE reception started at " << formatTimestamp(responseRxBeginTimestamp) << " and finished at "
             << formatTimestamp(clockTime()) << endl;
 
     const auto frame = dynamic_cast<const ResponseFrame*>(completion.getFrame());
