@@ -16,6 +16,7 @@
 import os.path
 import argparse
 import numpy
+import scipy.constants
 from smile.frames import Frames
 from smile.nodes import Nodes
 
@@ -45,9 +46,15 @@ if __name__ == '__main__':
     response_frames = frames[response_frames_condition]
     poll_frames = frames[poll_frames_condition]
 
-    # Here we will store ToF between mobile node and three anchors, each row will contain ToF in ps and anchor's
-    # MAC address
-    time_of_flights = numpy.zeros((3, 2))
+    # Here we will store distance between mobile node and three anchors, each row will contain value in meters and
+    # anchor's MAC address
+    distances = numpy.zeros((3, 2))
+
+    processing_delay = 4  # ms
+    processing_delay = processing_delay * 1e+9  # ms -> ps
+
+    c = scipy.constants.value('speed of light in vacuum')
+    c = c * 1e-12  # m/s -> m/ps
 
     # Iterate over POLL and RESPONSE frames
     sequence_numbers = (1, 2, 3)
@@ -58,7 +65,8 @@ if __name__ == '__main__':
         response_frame = response_frames[response_frames.sequence_numbers == sequence_number]
 
         # Compute ToF and fill time_of_flights array
-        time_of_flights[i, 0] = response_frame.begin_timestamps[0, 0] - poll_frame.begin_positions[0, 0]
-        time_of_flights[i, 1] = response_frame.mac_addresses[0, 0]
+        tof = (response_frame.begin_timestamps[0, 0] - poll_frame.begin_timestamps[0, 0] - processing_delay) / 2
+        distances[i, 0] = tof * c
+        distances[i, 1] = response_frame.mac_addresses[0, 0]
 
     pass  # TODO
