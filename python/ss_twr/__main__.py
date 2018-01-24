@@ -15,7 +15,7 @@
 
 import os.path
 import argparse
-import numpy
+import numpy as np
 import scipy.constants
 from smile.frames import Frames
 from smile.nodes import Nodes
@@ -28,19 +28,19 @@ if __name__ == '__main__':
     logs_directory_path = arguments.logs_directory_path[0]
 
     # Load data from CSV files
-    anchors = Nodes.load_csv(os.path.join(logs_directory_path, 'ss_twr_mobile_nodes.csv'))
+    anchors = Nodes.load_csv(os.path.join(logs_directory_path, 'ss_twr_anchor_nodes.csv'))
     mobiles = Nodes.load_csv(os.path.join(logs_directory_path, 'ss_twr_mobile_nodes.csv'))
     frames = Frames.load_csv(os.path.join(logs_directory_path, 'ss_twr_frames.csv'))
 
     # Construct POLL frames filter, i.e. transmitted frames ('TX' directions) sent by mobile node
     # (frames.mac_addresses[:, 0] equal to mobile nod'se MAC address)
-    poll_frames_condition = numpy.logical_and(frames[:, Frames.DIRECTION] == hash('TX'),
-                                              frames[:, Frames.SOURCE_MAC_ADDRESS] == mobiles[0, Nodes.MAC_ADDRESS])
+    poll_frames_condition = np.logical_and(frames[:, Frames.DIRECTION] == hash('TX'),
+                                           frames[:, Frames.SOURCE_MAC_ADDRESS] == mobiles[0, Nodes.MAC_ADDRESS])
 
     # Construct REPONSE frames filter, i.e. transmitted frames ('RX' directions) sent to mobile node
     # (frames.mac_addresses[:, 1] equal to mobile nod'se MAC address)
-    response_frames_condition = numpy.logical_and(frames[:, Frames.DIRECTION] == hash('RX'),
-                                                  frames[:, Frames.DESTINATION_MAC_ADDRESS] == mobiles[0, Nodes.MAC_ADDRESS])
+    response_frames_condition = np.logical_and(frames[:, Frames.DIRECTION] == hash('RX'),
+                                               frames[:, Frames.DESTINATION_MAC_ADDRESS] == mobiles[0, Nodes.MAC_ADDRESS])
 
     # Apply filters constructed above
     response_frames = frames[response_frames_condition]
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     # Here we will store distance between mobile node and three anchors, each row will contain value in meters and
     # anchor's MAC address
-    distances = numpy.zeros((3, 2))
+    distances = np.zeros((3, 2))
 
     processing_delay = 4  # ms
     processing_delay = processing_delay * 1e+9  # ms -> ps
@@ -69,7 +69,16 @@ if __name__ == '__main__':
         distances[i, 0] = tof * c
         distances[i, 1] = response_frame[0, Frames.DESTINATION_MAC_ADDRESS]
 
-    A = numpy.zeros((3, 3))
-    A 
+    A = np.zeros((3, 3))
+    A[:, (0, 1)] = -2 * anchors[:, Nodes.POSITION_2D]
+    A[:, 2] = 1
+
+    B = np.zeros((3, 3))
+    B[:, 0] = distances[:, 0]
+    B[:, (1, 2)] = anchors[:, Nodes.POSITION_2D]
+    B = np.power(B, 2)
+    B = B[:, 0] - B[:, 1] - B[:, 2]
+
+    tmp, _, _, _ = np.linalg.lstsq(A, B, rcond=None)
 
     pass  # TODO
