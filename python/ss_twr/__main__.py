@@ -28,19 +28,19 @@ if __name__ == '__main__':
     logs_directory_path = arguments.logs_directory_path[0]
 
     # Load data from CSV files
-    anchors = Nodes(os.path.join(logs_directory_path, 'ss_twr_mobile_nodes.csv'))
-    mobiles = Nodes(os.path.join(logs_directory_path, 'ss_twr_mobile_nodes.csv'))
-    frames = Frames(os.path.join(logs_directory_path, 'ss_twr_frames.csv'))
+    anchors = Nodes.load_csv(os.path.join(logs_directory_path, 'ss_twr_mobile_nodes.csv'))
+    mobiles = Nodes.load_csv(os.path.join(logs_directory_path, 'ss_twr_mobile_nodes.csv'))
+    frames = Frames.load_csv(os.path.join(logs_directory_path, 'ss_twr_frames.csv'))
 
     # Construct POLL frames filter, i.e. transmitted frames ('TX' directions) sent by mobile node
     # (frames.mac_addresses[:, 0] equal to mobile nod'se MAC address)
-    poll_frames_condition = numpy.logical_and(frames.directions == 'TX',
-                                              frames.mac_addresses[:, 0] == mobiles.mac_addresses[0])
+    poll_frames_condition = numpy.logical_and(frames[:, Frames.DIRECTION] == hash('TX'),
+                                              frames[:, Frames.SOURCE_MAC_ADDRESS] == mobiles[0, Nodes.MAC_ADDRESS])
 
     # Construct REPONSE frames filter, i.e. transmitted frames ('RX' directions) sent to mobile node
     # (frames.mac_addresses[:, 1] equal to mobile nod'se MAC address)
-    response_frames_condition = numpy.logical_and(frames.directions == 'RX',
-                                                  frames.mac_addresses[:, 1] == mobiles.mac_addresses[0])
+    response_frames_condition = numpy.logical_and(frames[:, Frames.DIRECTION] == hash('RX'),
+                                                  frames[:, Frames.DESTINATION_MAC_ADDRESS] == mobiles[0, Nodes.MAC_ADDRESS])
 
     # Apply filters constructed above
     response_frames = frames[response_frames_condition]
@@ -61,12 +61,15 @@ if __name__ == '__main__':
     for i in range(len(sequence_numbers)):
         # Lookup POLL
         sequence_number = sequence_numbers[i]
-        poll_frame = poll_frames[poll_frames.sequence_numbers == sequence_number]
-        response_frame = response_frames[response_frames.sequence_numbers == sequence_number]
+        poll_frame = poll_frames[poll_frames[:, Frames.SEQUENCE_NUMBER] == sequence_number]
+        response_frame = response_frames[response_frames[:, Frames.SEQUENCE_NUMBER] == sequence_number]
 
         # Compute ToF and fill time_of_flights array
-        tof = (response_frame.begin_timestamps[0, 0] - poll_frame.begin_timestamps[0, 0] - processing_delay) / 2
+        tof = (response_frame[0, Frames.BEGIN_CLOCK_TIMESTAMP] - poll_frame[0, Frames.BEGIN_CLOCK_TIMESTAMP] - processing_delay) / 2
         distances[i, 0] = tof * c
-        distances[i, 1] = response_frame.mac_addresses[0, 0]
+        distances[i, 1] = response_frame[0, Frames.DESTINATION_MAC_ADDRESS]
+
+    A = numpy.zeros((3, 3))
+    A 
 
     pass  # TODO
